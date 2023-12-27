@@ -22,7 +22,7 @@ import com.matt.sbdemo.model.ProductRequest;
 import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
-@RequestMapping(value = "shop")
+@RequestMapping(value = "/v1/shop")
 public class ShopperController {
 	
 	@Autowired

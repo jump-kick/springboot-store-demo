@@ -40,6 +40,7 @@ public class ShopperControllerTest {
 
 	private Product prod = null;
 	
+	private static final String V1 = "/v1";
 	private static final String SHOP = "/shop";
 	
 	@BeforeEach
@@ -54,7 +55,7 @@ public class ShopperControllerTest {
 	@Test
 	public void testAddProduct() throws Exception {
 		String p = new ObjectMapper().writeValueAsString(ProductRequest.builder().id(prod.getId()).quantity(1).build());
-		mvc.perform(post(SHOP + "/addToBasket").contentType(MediaType.APPLICATION_JSON).content(p))
+		mvc.perform(post(V1 + SHOP + "/addToBasket").contentType(MediaType.APPLICATION_JSON).content(p))
 			.andExpect(status().isOk())
 			.andExpect(content().string(containsString(getProductA().getDescription())))
 			.andDo(print());
@@ -70,7 +71,7 @@ public class ShopperControllerTest {
 				.id(prod.getId())
 				.quantity(3)
 				.build());
-		mvc.perform(post(SHOP + "/addToBasket").contentType(MediaType.APPLICATION_JSON).content(p))
+		mvc.perform(post(V1 + SHOP + "/addToBasket").contentType(MediaType.APPLICATION_JSON).content(p))
 			.andExpect(status().isOk())
 			.andExpect(content().string(containsString(getProductA().getDescription())))
 			.andDo(print());
@@ -83,10 +84,10 @@ public class ShopperControllerTest {
 	@Test
 	public void testUpdateQuantity() throws Exception {
 		String p = new ObjectMapper().writeValueAsString(ProductRequest.builder().id(prod.getId()).quantity(1).build());
-		mvc.perform(post(SHOP + "/addToBasket").contentType(MediaType.APPLICATION_JSON).content(p));
+		mvc.perform(post(V1 + SHOP + "/addToBasket").contentType(MediaType.APPLICATION_JSON).content(p));
 		
 		p = new ObjectMapper().writeValueAsString(ProductRequest.builder().id(prod.getId()).quantity(3).build());
-		mvc.perform(put(SHOP + "/updateQuantity").contentType(MediaType.APPLICATION_JSON).content(p))
+		mvc.perform(put(V1 + SHOP + "/updateQuantity").contentType(MediaType.APPLICATION_JSON).content(p))
 		.andExpect(status().isOk())
 		.andExpect(content().string(containsString(getProductA().getDescription())))
 		.andDo(print());
@@ -100,16 +101,16 @@ public class ShopperControllerTest {
 	@Test
 	public void testRemoveAllOfAProduct() throws Exception {
 		String p = new ObjectMapper().writeValueAsString(ProductRequest.builder().id(prod.getId()).quantity(1).build());
-		mvc.perform(post(SHOP + "/addToBasket").contentType(MediaType.APPLICATION_JSON).content(p));
+		mvc.perform(post(V1 + SHOP + "/addToBasket").contentType(MediaType.APPLICATION_JSON).content(p));
 		
 		p = new ObjectMapper().writeValueAsString(ProductRequest.builder().id(prod.getId()).quantity(3).build());
-		mvc.perform(put(SHOP + "/updateQuantity").contentType(MediaType.APPLICATION_JSON).content(p));
+		mvc.perform(put(V1 + SHOP + "/updateQuantity").contentType(MediaType.APPLICATION_JSON).content(p));
 		
 		Integer count = basket.getBasket().get(prod);
 		
 	    assertEquals(3, count, "Should be updated to 3");
 		
-		mvc.perform(delete(SHOP + "/removeAll/" + prod.getId()).contentType(MediaType.APPLICATION_JSON))
+		mvc.perform(delete(V1 + SHOP + "/removeAll/" + prod.getId()).contentType(MediaType.APPLICATION_JSON))
 		.andExpect(status().isOk())
 		.andDo(print());
 		

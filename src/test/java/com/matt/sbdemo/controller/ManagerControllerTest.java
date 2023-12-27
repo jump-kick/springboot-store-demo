@@ -39,6 +39,7 @@ public class ManagerControllerTest {
 	@Autowired
 	private MockMvc mvc;
 	
+	private static final String V1 = "/v1";
 	private static final String MANAGE = "/manage";
 	
 	@BeforeEach
@@ -51,7 +52,7 @@ public class ManagerControllerTest {
 	public void testAddProduct() throws Exception {
 		
 		String p = getProductJson();
-		mvc.perform(post(MANAGE + "/createProduct").contentType(MediaType.APPLICATION_JSON).content(p))
+		mvc.perform(post(V1 + MANAGE + "/createProduct").contentType(MediaType.APPLICATION_JSON).content(p))
 			.andExpect(status().isOk())
 			.andExpect(content().string(containsString(getProductA().getDescription())))
 			.andDo(print());
@@ -68,7 +69,7 @@ public class ManagerControllerTest {
 		String desc = "New description!!";
 		
 		Product editedProd = new Product(prod.getId(), prod.getName(), prod.getPrice(), desc);
-		mvc.perform(post(MANAGE + "/editProduct").contentType(MediaType.APPLICATION_JSON)
+		mvc.perform(post(V1 + MANAGE + "/editProduct").contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(editedProd)))
 			.andExpect(status().isOk())
 			.andExpect(content().string(containsString(desc)))
@@ -82,7 +83,7 @@ public class ManagerControllerTest {
 		Product prod = repo.save(getProductA());
 		
 		Product editedProd = new Product(prod.getId(), prod.getName(), newPrice, prod.getDescription());
-		mvc.perform(post(MANAGE + "/editProduct").contentType(MediaType.APPLICATION_JSON)
+		mvc.perform(post(V1 + MANAGE + "/editProduct").contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(editedProd)))
 			.andExpect(status().isOk())
 			.andExpect(content().string(containsString(Double.toString(newPrice))))
@@ -96,7 +97,7 @@ public class ManagerControllerTest {
 		
 		Product newProd = Product.builder().id(saved.getId() + 1).name("New")
 				.description("It's new!").price(10.00).build();
-		mvc.perform(post(MANAGE + "/editProduct").contentType(MediaType.APPLICATION_JSON)
+		mvc.perform(post(V1 + MANAGE + "/editProduct").contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(newProd)))
 			.andExpect(status().isBadRequest())
 			.andDo(print());
@@ -107,7 +108,7 @@ public class ManagerControllerTest {
 
 		Product newProd = Product.builder().name("New")
 				.description("It's new!").price(10.00).build();
-		mvc.perform(post(MANAGE + "/editProduct").contentType(MediaType.APPLICATION_JSON)
+		mvc.perform(post(V1 + MANAGE + "/editProduct").contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(newProd)))
 			.andExpect(status().isBadRequest())
 			.andDo(print());
@@ -117,7 +118,7 @@ public class ManagerControllerTest {
 	public void testDeleteProduct() throws JsonProcessingException, Exception {
 		Product prod = repo.save(getProductA());
 		
-		mvc.perform(delete(MANAGE + "/deleteProduct").contentType(MediaType.APPLICATION_JSON)
+		mvc.perform(delete(V1 + MANAGE + "/deleteProduct").contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(prod)))
 			.andExpect(status().isOk())
 			.andDo(print());
@@ -127,7 +128,7 @@ public class ManagerControllerTest {
 	
 	@Test
 	public void testGetAvailableDeals() throws Exception {
-		mvc.perform(get(MANAGE + "/availableDeals").contentType(MediaType.APPLICATION_JSON))
+		mvc.perform(get(V1 + MANAGE + "/availableDeals").contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(content().string(containsString("Buy One, Get One 50% off!")))
 			//.andExpect(content().string(containsString("Buy one product, get a different one free!")))
@@ -136,7 +137,7 @@ public class ManagerControllerTest {
 	
 	@Test
 	public void testGetAvailableBundleDeals() throws Exception {
-		mvc.perform(get(MANAGE + "/availableBundleDeals").contentType(MediaType.APPLICATION_JSON))
+		mvc.perform(get(V1 + MANAGE + "/availableBundleDeals").contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(content().string(containsString("Buy one product, get a different one free!")))
 			.andDo(print());
@@ -148,7 +149,7 @@ public class ManagerControllerTest {
 		Bogo50PercentDeal deal = new Bogo50PercentDeal(1L);
 		assertFalse(dealManager.getActiveDeals().contains(deal), "The deal should not be there.");
 		
-		mvc.perform(post(MANAGE + "/applyDeal").contentType(MediaType.APPLICATION_JSON)
+		mvc.perform(post(V1 + MANAGE + "/applyDeal").contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(getBogo50Request())))
 			.andExpect(status().isOk())
 			.andExpect(content().string(containsString("true")))
@@ -163,7 +164,7 @@ public class ManagerControllerTest {
 		assertFalse(dealManager.getActiveDeals().contains(deal), "The deal should not be there.");
 		ApplyDealRequest r = getBogo50Request();
 		r.setDiscountCode("BOGOBOGOBOGO");
-		mvc.perform(post(MANAGE + "/applyDeal").contentType(MediaType.APPLICATION_JSON)
+		mvc.perform(post(V1 + MANAGE + "/applyDeal").contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(r)))
 			.andExpect(status().isOk())
 			.andExpect(content().string(containsString("false")))
@@ -177,7 +178,7 @@ public class ManagerControllerTest {
 		BogoBundleDeal deal = new BogoBundleDeal(1L, 2L);
 		assertFalse(dealManager.getActiveDeals().contains(deal), "The deal should not be there.");
 		
-		mvc.perform(post(MANAGE + "/applyDeal").contentType(MediaType.APPLICATION_JSON)
+		mvc.perform(post(V1 + MANAGE + "/applyDeal").contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(getBogoBundleRequest())))
 			.andExpect(status().isOk())
 			.andExpect(content().string(containsString("true")))
@@ -192,7 +193,7 @@ public class ManagerControllerTest {
 		assertFalse(dealManager.getActiveDeals().contains(deal), "The deal should not be there.");
 		ApplyDealRequest r = getBogoBundleRequest();
 		r.setDiscountCode("BOGOBOGOBOGO");
-		mvc.perform(post(MANAGE + "/applyDeal").contentType(MediaType.APPLICATION_JSON)
+		mvc.perform(post(V1 + MANAGE + "/applyDeal").contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(r)))
 			.andExpect(status().isOk())
 			.andExpect(content().string(containsString("false")))
@@ -210,7 +211,7 @@ public class ManagerControllerTest {
 		assertTrue(dealManager.getActiveDeals().contains(deal), "The deal should be there now.");
 		assertTrue(dealManager.getActiveDeals().contains(deal1), "The deal should be there now.");
 		
-		mvc.perform(delete(MANAGE + "/clearActiveDeals").contentType(MediaType.APPLICATION_JSON)
+		mvc.perform(delete(V1 + MANAGE + "/clearActiveDeals").contentType(MediaType.APPLICATION_JSON)
 				.content(new ObjectMapper().writeValueAsString(getBogoBundleRequest())))
 			.andExpect(status().isOk())
 			.andDo(print());

@@ -25,7 +25,7 @@ import com.matt.sbdemo.model.Product;
 import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
-@RequestMapping(value = "manage")
+@RequestMapping(value = "/v1/manage")
 public class ManagerController {
 	
 	@Autowired
